@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:your_app/providers/auth_provider.dart';
-import 'screens/auth_screen.dart';
-import 'screens/queue_list_screen.dart';
+import 'package:university_queue_app/providers/auth_provider.dart';
+import 'package:university_queue_app/screens/auth_screen.dart';
+import 'package:university_queue_app/screens/queue_list_screen.dart';
 
 void main() {
   runApp(
@@ -10,12 +10,14 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,8 +25,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Consumer<AuthProvider>(
         builder: (ctx, auth, _) => auth.isAuthenticated
-            ? QueueListScreen()
-            : AuthScreen(),
+            ? const QueueListScreen()
+            : const AuthScreen(),
       ),
     );
   }

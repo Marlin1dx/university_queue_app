@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:your_app/api/websocket_service.dart';
+import 'package:university_queue_app/api/websocket_service.dart';
 
 class QueueStatusScreen extends StatefulWidget {
   final int queueId;

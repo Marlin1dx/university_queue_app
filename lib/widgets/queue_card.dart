@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:your_app/api/api_service.dart';
-import 'package:your_app/screens/queue_status_screen.dart';
+import 'package:university_queue_app/models/queue.dart';
 
 class QueueCard extends StatelessWidget {
   final Queue queue;
@@ -15,21 +14,7 @@ class QueueCard extends StatelessWidget {
         title: Text(queue.name),
         subtitle: Text('Текущая позиция: ${queue.currentPosition}'),
         trailing: ElevatedButton(
-          onPressed: () async {
-            try {
-              await ApiService().joinQueue(queue.id);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => QueueStatusScreen(queueId: queue.id),
-                ),
-              );
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Ошибка записи в очередь')),
-              );
-            }
-          },
+          onPressed: () {}, // Пока оставьте пустым
           child: Text('Записаться'),
         ),
       ),

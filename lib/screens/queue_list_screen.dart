@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:your_app/api/api_service.dart';
-import 'package:your_app/models/queue.dart';
-import 'package:your_app/widgets/queue_card.dart';
+import 'package:university_queue_app/api/api_service.dart';
+import 'package:university_queue_app/models/queue.dart';
+import 'package:university_queue_app/widgets/queue_card.dart';
 
 class QueueListScreen extends StatefulWidget {
   @override

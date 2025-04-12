@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:your_app/providers/auth_provider.dart';
+import 'package:university_queue_app/providers/auth_provider.dart';
 
 class AuthScreen extends StatelessWidget {
   final _emailController = TextEditingController(text: 'test@example.com');
