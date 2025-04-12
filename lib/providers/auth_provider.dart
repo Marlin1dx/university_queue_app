@@ -1,70 +1,90 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import '../api/api_service.dart';
+import 'package:university_queue_app/api/api_service.dart';
+import 'dart:convert';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthProvider with ChangeNotifier {
+  bool _isAuthenticated = false;
+  bool _isAdmin = false;
   bool _isLoading = false;
   String? _errorMessage;
-  String? _authToken;
-  bool _isAuthenticated = false;
 
+  bool get isAuthenticated => _isAuthenticated;
+  bool get isAdmin => _isAdmin;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  bool get isAuthenticated => _isAuthenticated;
-  String? get authToken => _authToken;
 
-  Future<void> autoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('jwt_token');
-    
-    if (token != null) {
-      _authToken = token;
-      _isAuthenticated = true;
-      notifyListeners();
-    }
+  AuthProvider() {
+    checkAuthStatus(); 
   }
 
   Future<void> login(String email, String password) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
     try {
-      final response = await http.post(
-        Uri.parse('${ApiService.baseUrl}/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
 
-      final responseData = jsonDecode(response.body);
-      
+      final response = await ApiService().login(email, password);
+      final responseBody = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
+        final token = responseBody['access_token'] ?? responseBody['token'];
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('jwt_token', responseData['access_token']);
+        await prefs.setString('jwt_token', token);
         
-        _authToken = responseData['access_token'];
-        _isAuthenticated = true;
+        _updateAuthState(token);
       } else {
-        _errorMessage = responseData['error'] ?? 'Ошибка авторизации';
+        _handleError(responseBody['error'] ?? 'Ошибка авторизации');
       }
     } catch (e) {
-      _errorMessage = e.toString().contains('SocketException')
-          ? 'Ошибка подключения к серверу'
-          : 'Неизвестная ошибка';
+      _handleError(e.toString());
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
+  void _updateAuthState(String? token) {
+    if (token == null) {
+      _isAuthenticated = false;
+      _isAdmin = false;
+      return;
+    }
+
+    _isAuthenticated = true;
+    _isAdmin = _checkAdminRole(token);
+    notifyListeners();
+  }
+
+  bool _checkAdminRole(String token) {
+    try {
+      final decodedToken = JwtDecoder.decode(token);
+      return decodedToken['is_admin'] ?? false; 
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> checkAuthStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+    _updateAuthState(token);
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
-    
-    _authToken = null;
     _isAuthenticated = false;
+    _isAdmin = false;
     notifyListeners();
+  }
+
+  void _handleError(String message) {
+    _errorMessage = message;
+    _isAuthenticated = false;
+    _isAdmin = false;
+    notifyListeners();
+    throw Exception(message);
   }
 }
