@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:university_queue_app/models/queue.dart';
+
 
 class ApiService {
   static const String baseUrl = 'http://localhost:8000/api';

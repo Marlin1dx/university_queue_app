@@ -15,6 +15,22 @@ void main() {
   );
 }
 
+class Queue {
+  final int id;
+  final String name;
+
+  Queue({required this.id, required this.name});
+
+  factory Queue.fromJson(Map<String, dynamic> json) {
+    return Queue(
+      id: json['id'],
+      name: json['name'],
+    );
+  }
+}
+
+
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -25,8 +41,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Consumer<AuthProvider>(
         builder: (ctx, auth, _) => auth.isAuthenticated
-            ? const QueueListScreen()
-            : const AuthScreen(),
+            ? QueueListScreen()
+            : AuthScreen(),
       ),
     );
   }
